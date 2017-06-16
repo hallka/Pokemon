@@ -10,6 +10,10 @@ public class Trainer {
     private Pokemon left;
     private Pokemon center;
     private Pokemon right;
+    private Boolean rotRflag = false;
+    private Boolean rotLflag = false;
+    private Boolean itemflag = false;
+    private Boolean attackflag = false;
 
     public Trainer(Pokemon left, Pokemon center, Pokemon right){
         setCenter(center);
@@ -50,6 +54,10 @@ public class Trainer {
         return win;
     }
 
+    public Boolean checkLose(){
+        if(!(left.isAlive()) && !(right.isAlive()) && !(center.isAlive())) return true;
+        else return false;
+    }
 
     public void setRotable(Boolean rotable) {
         this.rotable = rotable;
@@ -66,6 +74,38 @@ public class Trainer {
 
     public Boolean checkRefreshed(){
         return getCenter().isRefreshed();
+    }
+
+    public Boolean getAttackflag() {
+        return attackflag;
+    }
+
+    public Boolean getItemflag() {
+        return itemflag;
+    }
+
+    public Boolean getRotLflag() {
+        return rotLflag;
+    }
+
+    public Boolean getRotRflag() {
+        return rotRflag;
+    }
+
+    public void setAttackflag(Boolean attackflag) {
+        this.attackflag = attackflag;
+    }
+
+    public void setItemflag(Boolean itemflag) {
+        this.itemflag = itemflag;
+    }
+
+    public void setRotLflag(Boolean rotLflag) {
+        this.rotLflag = rotLflag;
+    }
+
+    public void setRotRflag(Boolean rotRflag) {
+        this.rotRflag = rotRflag;
     }
 
     public void rotR(){

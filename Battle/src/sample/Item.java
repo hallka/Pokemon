@@ -40,3 +40,13 @@ class Heal extends Item{
         p.setHP(p.getHP() + getEff());
     }
 }
+
+class Buff extends Item{
+    public Buff(String name, int eff){
+        super(name, eff);
+    }
+
+    public void use(Pokemon p){
+        p.setHP(p.getHP() + getEff());
+    }
+}

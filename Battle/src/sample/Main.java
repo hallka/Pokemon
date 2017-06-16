@@ -68,9 +68,9 @@ public class Main extends Application
 
         Image damage = new Image("sample/damage.png");
 
-        //ポケモンとアイテムの選択
+        //init Pokemon and Item
         Trainer t1 = new Trainer(new MT(), new yamata(), new darkelf());
-        Trainer t2 = new Trainer(new unicorn(), new seiryu(), new dragon());
+        Trainer t2 = new Trainer(new MT(), new seiryu(), new dragon());
 
         t1.getCenter().setItem(new Heal("mazai", 30));
         t1.getRight().setItem(new Heal("mazai", 30));
@@ -93,53 +93,43 @@ public class Main extends Application
         p2.setY(p2_y);
 
 
-        //キーボード判定
+        //keyboard
         Battle.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
 
             if (code.equals("LEFT") && t1.isRotable()) {
-                t1.rotL();
-                p1.setImage(t1.getCenter().getImage());
+                t1.setRotLflag(true);
             }
             else if (code.equals("RIGHT") && t1.isRotable()) {
-                t1.rotR();
-                p1.setImage(t1.getCenter().getImage());
+                t1.setRotRflag(true);
             }
-            else if (code.equals("UP") && t1.checkRefreshed()) {
-                t1.attack(t2.getCenter());
-                t1.setRotable(true);
-                t2.setRotable(true);
-            }
-            else if (code.equals("DOWN") && t1.checkItem() && t1.getCenter().isAlive()){
-                t1.useItem();
-                t1.setRotable(true);
-                t2.setRotable(true);
+            else if(t1.getCenter().isAlive()) {
+                if (code.equals("UP") && t1.checkRefreshed()) {
+                    t1.setAttackflag(true);
+                } else if (code.equals("DOWN") && t1.checkItem()) {
+                    t1.setItemflag(true);
+                }
             }
 
             if (code.equals("Z") && t2.isRotable()) {
-                t2.rotL();
-                p2.setImage(t2.getCenter().getImage());
+                t2.setRotLflag(true);
             }
             else if (code.equals("C") && t2.isRotable()) {
-                t2.rotR();
-                p2.setImage(t2.getCenter().getImage());
+                t2.setRotRflag(true);
             }
-            else if (code.equals("S") && t2.checkRefreshed()) {
-                t2.attack(t1.getCenter());
-                t2.setRotable(true);
-                t1.setRotable(true);
-            }
-            else if (code.equals("X") && t2.checkItem() && t2.getCenter().isAlive()){
-                t2.useItem();
-                t2.setRotable(true);
-                t1.setRotable(true);
+            else if(t2.getCenter().isAlive()) {
+                if (code.equals("S") && t2.checkRefreshed()) {
+                    t2.setAttackflag(true);
+                } else if (code.equals("X") && t2.checkItem()) {
+                    t2.setItemflag(true);
+                }
             }
 
         });
 
         final long startNanoTime = System.nanoTime();
 
-        //戦闘のループ処理
+        //Battle Loop
         new AnimationTimer()
         {
             public void handle(long currentNanoTime)
@@ -152,86 +142,20 @@ public class Main extends Application
                 t1.refresh(3);
                 t2.refresh(3);
 
-                //生死判定
-                //その後ゲージ回復，表示
-                if(t1.getCenter().isAlive()) {
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+10, 75*5, 20);
-                    gc.setFill(new Color(1.0,0.0,0,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+10, t1.getCenter().getHP()*5, 20);
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+30, 10000*0.03, 15);
-                    gc.setFill(new Color(1.0,1.0,0,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+30, t1.getCenter().getRefresh()*0.03, 15);
-                    gc.strokeText(t1.getCenter().getName(), p2_x -50, p1_y);
-                }
+                //if alive, show HP
+                CheckGage(gc,t1,p2_x-50, p1_y);
+                CheckGage(gc,t2,p1_x,p2_y);
 
-                if(t1.getLeft().isAlive()) {
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+70, 75*5, 15);
-                    gc.setFill(new Color(1.0,0.0,0,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+70, t1.getLeft().getHP()*5, 15);
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+85, 10000*0.03, 10);
-                    gc.setFill(new Color(1.0,1.0,0,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+85, t1.getLeft().getRefresh()*0.03, 10);
-                    gc.strokeText(t1.getLeft().getName(), p2_x -50, p1_y+60);
-                }
+                //Check ActionFlag
+                CheckAction(t1,p1,t2);
+                CheckAction(t2,p2,t1);
 
-                if(t1.getRight().isAlive()) {
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+120, 75*5, 15);
-                    gc.setFill(new Color(1.0,0.0,0,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+120, t1.getRight().getHP()*5, 15);
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+135, 10000*0.03, 10);
-                    gc.setFill(new Color(1.0,1.0,0,1.0));
-                    gc.fillRect(p2_x - 50, p1_y+135, t1.getRight().getRefresh()*0.03, 10);
-                    gc.strokeText(t1.getRight().getName(), p2_x -50, p1_y+110);
-                }
-
-                if(t2.getCenter().isAlive()) {
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p1_x, p2_y+10, 75*5, 20);
-                    gc.setFill(new Color(1.0,0.0,0,1.0));
-                    gc.fillRect(p1_x, p2_y+10, t2.getCenter().getHP()*5, 20);
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p1_x, p2_y+30, 10000*0.03, 15);
-                    gc.setFill(new Color(1.0,1.0,0,1.0));
-                    gc.fillRect(p1_x, p2_y+30, t2.getCenter().getRefresh()*0.03, 15);
-                    gc.strokeText(t2.getCenter().getName(), p1_x, p2_y);
-                }
-
-                if(t2.getLeft().isAlive()) {
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p1_x, p2_y+70, 75*5, 15);
-                    gc.setFill(new Color(1.0,0.0,0,1.0));
-                    gc.fillRect(p1_x, p2_y+70, t2.getLeft().getHP()*5, 15);
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p1_x, p2_y+85, 10000*0.03, 10);
-                    gc.setFill(new Color(1.0,1.0,0,1.0));
-                    gc.fillRect(p1_x, p2_y+85, t2.getLeft().getRefresh()*0.03, 10);
-                    gc.strokeText(t2.getLeft().getName(), p1_x, p2_y+60);
-                }
-
-                if(t2.getRight().isAlive()) {
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p1_x, p2_y+120, 75*5, 15);
-                    gc.setFill(new Color(1.0,0.0,0,1.0));
-                    gc.fillRect(p1_x, p2_y+120, t2.getRight().getHP()*5, 15);
-                    gc.setFill(new Color(0.3,0.3,0.3,1.0));
-                    gc.fillRect(p1_x, p2_y+135, 10000*0.03, 10);
-                    gc.setFill(new Color(1.0,1.0,0,1.0));
-                    gc.fillRect(p1_x, p2_y+135, t2.getRight().getRefresh()*0.03, 10);
-                    gc.strokeText(t2.getRight().getName(), p1_x, p2_y+110);
-                }
-
-                //勝利判定
-                if(t1.isWin()){
+                //if win or lose, jump next scene
+                if(t1.isWin() || t2.checkLose()){
                     stage.setScene( WinResult );
                     stage.show();
                 }
-                if(t2.isWin()){
+                if(t2.isWin() || t1.checkLose()){
                     stage.setScene( LoseResult );
                     stage.show();
                 }
@@ -239,6 +163,68 @@ public class Main extends Application
             }
         }.start();
 
+    }
+
+    public void DrawGage(GraphicsContext gc, Pokemon p, double x, double y){
+        gc.setFill(new Color(0.3,0.3,0.3,1.0));
+        gc.fillRect(x, y+10, 75*5, 20);
+        gc.setFill(new Color(1.0,0.0,0,1.0));
+        gc.fillRect(x, y+10, p.getHP()*5, 20);
+        gc.setFill(new Color(0.3,0.3,0.3,1.0));
+        gc.fillRect(x, y+30, 10000*0.03, 15);
+        gc.setFill(new Color(1.0,1.0,0,1.0));
+        gc.fillRect(x, y+30, p.getRefresh()*0.03, 15);
+        gc.strokeText(p.getName(), x, y);
+    }
+
+    public void CheckGage(GraphicsContext gc, Trainer t, double x, double y){
+        if(t.getCenter().isAlive()) {
+            DrawGage(gc,t.getCenter(),x,y);
+        }
+        if(t.getLeft().isAlive()) {
+            DrawGage(gc,t.getLeft(),x,y+60);
+        }
+        if(t.getRight().isAlive()) {
+            DrawGage(gc,t.getRight(),x,y+120);
+        }
+    }
+
+    public void TrotL(Trainer t, ImageView p) {
+        t.rotL();
+        p.setImage(t.getCenter().getImage());
+    }
+    public void TrotR (Trainer t, ImageView p) {
+        t.rotR();
+        p.setImage(t.getCenter().getImage());
+    }
+    public void Attack (Trainer ta, Trainer tb) {
+        ta.attack(tb.getCenter());
+        ta.setRotable(true);
+        tb.setRotable(true);
+    }
+    public void UseItem (Trainer tu, Trainer to){
+        tu.useItem();
+        tu.setRotable(true);
+        to.setRotable(true);
+    }
+
+    public void CheckAction (Trainer tm, ImageView p, Trainer ts){
+        if(tm.getRotLflag()) {
+            TrotL(tm,p);
+            tm.setRotLflag(false);
+        }
+        if(tm.getRotRflag()) {
+            TrotR(tm,p);
+            tm.setRotRflag(false);
+        }
+        if(tm.getAttackflag()) {
+            Attack(tm,ts);
+            tm.setAttackflag(false);
+        }
+        if(tm.getItemflag()) {
+            UseItem(tm,ts);
+            tm.setItemflag(false);
+        }
     }
 
     public void WinResult(Stage stage){
