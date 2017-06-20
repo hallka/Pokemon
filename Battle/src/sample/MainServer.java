@@ -12,10 +12,19 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.animation.AnimationTimer;
 
-public class Main extends Application
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class MainServer extends Application
 {
+    static final int PORT = 54312;
+    ServerSocket s = null;
+    Socket socket = null;
+    Boolean isConnect = false;
 
     private Scene Select = null;
+    private Scene Connect = null;
     private Scene Battle = null;
     private Scene WinResult = null;
     private Scene LoseResult = null;
@@ -26,9 +35,10 @@ public class Main extends Application
     @Override
     public void start(Stage stage)
     {
-        stage.setTitle( "Pokemon Battle" );
+        stage.setTitle( "Pokemon Battle @server" );
 
         this.Select(stage);
+        this.Connect(stage);
         this.Battle(stage);
         this.LoseResult(stage);
         this.WinResult(stage);
@@ -47,6 +57,37 @@ public class Main extends Application
             if(code.equals("Z")){
                 stage.setScene(Battle);
                 stage.show();
+            }else if(code.equals("C")){
+                stage.setScene(Connect);
+                stage.show();
+            }
+        });
+    }
+
+    public void Connect(Stage stage){
+        Group root = new Group();
+        this.Connect = new Scene(root);
+        ImageView image = new ImageView("sample/text_tsushin.png");
+        root.getChildren().add(image);
+        Connect.setOnKeyPressed(event -> {
+            try {
+                s = new ServerSocket(PORT);
+                socket = s.accept();
+                try {
+                    PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                    out.print(1);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    if (in.read() == 1) {
+                        System.out.println("Started: " + s);
+                        isConnect = true;
+                        stage.setScene(Battle);
+                        stage.show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }catch (IOException e){
+                e.printStackTrace();
             }
         });
     }
@@ -92,39 +133,56 @@ public class Main extends Application
         p2.setX(p2_x);
         p2.setY(p2_y);
 
-
         //keyboard
         Battle.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
+            if(isConnect) {
+                try {
+                    PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                    if (code.equals("LEFT") && t1.isRotable()) {
+                        t1.setRotLflag(true);
+                        out.print(4);
+                    } else if (code.equals("RIGHT") && t1.isRotable()) {
+                        t1.setRotRflag(true);
+                        out.print(6);
+                    } else if (t1.getCenter().isAlive()) {
+                        if (code.equals("UP") && t1.checkRefreshed()) {
+                            t1.setAttackflag(true);
+                            out.print(8);
+                        } else if (code.equals("DOWN") && t1.checkItem()) {
+                            t1.setItemflag(true);
+                            out.print(2);
+                        }
+                    }
 
-            if (code.equals("LEFT") && t1.isRotable()) {
-                t1.setRotLflag(true);
-            }
-            else if (code.equals("RIGHT") && t1.isRotable()) {
-                t1.setRotRflag(true);
-            }
-            else if(t1.getCenter().isAlive()) {
-                if (code.equals("UP") && t1.checkRefreshed()) {
-                    t1.setAttackflag(true);
-                } else if (code.equals("DOWN") && t1.checkItem()) {
-                    t1.setItemflag(true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }else {
+                if (code.equals("LEFT") && t1.isRotable()) {
+                    t1.setRotLflag(true);
+                } else if (code.equals("RIGHT") && t1.isRotable()) {
+                    t1.setRotRflag(true);
+                } else if (t1.getCenter().isAlive()) {
+                    if (code.equals("UP") && t1.checkRefreshed()) {
+                        t1.setAttackflag(true);
+                    } else if (code.equals("DOWN") && t1.checkItem()) {
+                        t1.setItemflag(true);
+                    }
+                }
+
+                if (code.equals("Z") && t2.isRotable()) {
+                    t2.setRotLflag(true);
+                } else if (code.equals("C") && t2.isRotable()) {
+                    t2.setRotRflag(true);
+                } else if (t2.getCenter().isAlive()) {
+                    if (code.equals("S") && t2.checkRefreshed()) {
+                        t2.setAttackflag(true);
+                    } else if (code.equals("X") && t2.checkItem()) {
+                        t2.setItemflag(true);
+                    }
                 }
             }
-
-            if (code.equals("Z") && t2.isRotable()) {
-                t2.setRotLflag(true);
-            }
-            else if (code.equals("C") && t2.isRotable()) {
-                t2.setRotRflag(true);
-            }
-            else if(t2.getCenter().isAlive()) {
-                if (code.equals("S") && t2.checkRefreshed()) {
-                    t2.setAttackflag(true);
-                } else if (code.equals("X") && t2.checkItem()) {
-                    t2.setItemflag(true);
-                }
-            }
-
         });
 
         final long startNanoTime = System.nanoTime();
@@ -145,6 +203,25 @@ public class Main extends Application
                 //if alive, show HP
                 CheckGage(gc,t1,p2_x-50, p1_y);
                 CheckGage(gc,t2,p1_x,p2_y);
+
+                if(isConnect) {
+                    try {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        if (in.read() == 4 && t2.isRotable()) {
+                            t2.setRotLflag(true);
+                        } else if (in.read() == 6 && t2.isRotable()) {
+                            t2.setRotRflag(true);
+                        } else if (t2.getCenter().isAlive()) {
+                            if (in.read() == 8 && t2.checkRefreshed()) {
+                                t2.setAttackflag(true);
+                            } else if (in.read() == 2 && t2.checkItem()) {
+                                t2.setItemflag(true);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 //Check ActionFlag
                 CheckAction(t1,p1,t2);
@@ -232,6 +309,14 @@ public class Main extends Application
         this.WinResult = new Scene(root);
         ImageView image = new ImageView("sample/pose_win_boy.png");
         root.getChildren().add(image);
+        if(isConnect) {
+            try {
+                socket.close();
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         WinResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if(code.equals("Z")){
@@ -245,6 +330,14 @@ public class Main extends Application
         this.LoseResult = new Scene(root);
         ImageView image = new ImageView("sample/pose_lose_boy.png");
         root.getChildren().add(image);
+        if(isConnect) {
+            try {
+                socket.close();
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         LoseResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if(code.equals("Z")){
@@ -252,7 +345,8 @@ public class Main extends Application
             }
         });
     }
-    public static void main(String[] args)
+
+    public static void main(String[] args) throws IOException
     {
         launch(args);
     }
