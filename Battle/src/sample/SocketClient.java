@@ -14,6 +14,8 @@ public class SocketClient {
     private BufferedReader Reader;
     private OnReceiveListener onReceiveListener;
 
+    private Boolean CloseFlag = false;
+
     public SocketClient(String host, int port){
         try{
             addr = InetAddress.getByName(host);
@@ -41,6 +43,7 @@ public class SocketClient {
         new Thread(new Runnable(){
             public void run(){
                 while(true){
+                    if(CloseFlag) break;
                     try{
                         String line = Reader.readLine();
                         System.out.println("Receive :" + line);
@@ -56,6 +59,7 @@ public class SocketClient {
 
     public void close(){
         try {
+            CloseFlag = true;
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

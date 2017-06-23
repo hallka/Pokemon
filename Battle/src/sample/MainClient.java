@@ -19,8 +19,9 @@ public class MainClient extends Application
     private static int port = 54312;
     private SocketClient socket = null;
     private String host = "PC";
-    public Boolean isConnect = false;
-    public Boolean isReady = false;
+    private Boolean isConnect = false;
+    private Boolean isReady = false;
+    private Boolean isInited = false;
 
     private Scene Select = null;
     private Scene Connect = null;
@@ -74,20 +75,12 @@ public class MainClient extends Application
         Connect.setOnKeyPressed(event -> {
             if(!isConnect) {
                 socket = new SocketClient(host, port);
-                socket.onReceive(new OnReceiveListener() {
-                    @Override
-                    public void onReceive(String received) {
-                        System.out.println("Connection to" + host + ", Establishing");
-                        isReady = true;
-                    }
-                });
+                isReady = true;
                 isConnect = true;
             }else if(isReady){
-                isReady = false;
                 stage.setScene(Battle);
                 stage.show();
             }
-            socket.send("Ping");
         });
 
     }
@@ -110,8 +103,8 @@ public class MainClient extends Application
         Image damage = new Image("sample/damage.png");
 
         //init Pokemon and Item
-        Trainer t1 = new Trainer(new MT(), new yamata(), new darkelf());
-        Trainer t2 = new Trainer(new MT(), new seiryu(), new dragon());
+        Trainer t1 = new Trainer(new MT(), new seiryu(), new dragon());
+        Trainer t2 = new Trainer(new MT(), new yamata(), new darkelf());
 
         t1.getCenter().setItem(new Heal("mazai", 30));
         t1.getRight().setItem(new Heal("mazai", 30));
@@ -138,7 +131,7 @@ public class MainClient extends Application
             String code = event.getCode().toString();
             if(isConnect){
 
-                if(!isReady){
+                if(!isInited){
                     socket.onReceive(new OnReceiveListener() {
                         @Override
                         public void onReceive(String str) {
@@ -155,7 +148,7 @@ public class MainClient extends Application
                             }
                         }
                     });
-                    isReady = true;
+                    isInited = true;
                 }
 
                 if (code.equals("LEFT") && t1.isRotable()) {
@@ -305,12 +298,12 @@ public class MainClient extends Application
         this.WinResult = new Scene(root);
         ImageView image = new ImageView("sample/pose_win_boy.png");
         root.getChildren().add(image);
-        if(isConnect) {
-            socket.close();
-        }
         WinResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if(code.equals("Z")){
+                if(isConnect) {
+                    socket.close();
+                }
                 Platform.exit();
             }
         });
@@ -321,12 +314,12 @@ public class MainClient extends Application
         this.LoseResult = new Scene(root);
         ImageView image = new ImageView("sample/pose_lose_boy.png");
         root.getChildren().add(image);
-        if(isConnect) {
-            socket.close();
-        }
         LoseResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if(code.equals("Z")){
+                if(isConnect) {
+                    socket.close();
+                }
                 Platform.exit();
             }
         });

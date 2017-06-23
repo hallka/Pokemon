@@ -14,6 +14,8 @@ public class SocketServer {
     private BufferedReader Reader;
     private OnReceiveListener onReceiveListener;
 
+    private Boolean CloseFlag = false;
+
     public SocketServer(int port){
         try{
             s = new ServerSocket(port);
@@ -28,7 +30,7 @@ public class SocketServer {
 
     public void send(String data){
         try{
-            Writer.write(data);
+            Writer.println(data);
             Writer.flush();
             System.out.println("Send :" + data);
         }
@@ -41,6 +43,7 @@ public class SocketServer {
         new Thread(new Runnable(){
             public void run(){
                 while(true){
+                    if(CloseFlag) break;
                     try{
                         String line = Reader.readLine();
                         System.out.println("Receive :" + line);
@@ -50,12 +53,14 @@ public class SocketServer {
                         ex.printStackTrace();
                     }
                 }
+
             }
         }).start();
     }
 
     public void close() {
         try {
+            CloseFlag = true;
             socket.close();
             s.close();
         } catch (IOException e) {
