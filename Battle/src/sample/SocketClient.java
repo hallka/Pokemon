@@ -46,7 +46,9 @@ public class SocketClient {
                     if(CloseFlag) break;
                     try{
                         String line = Reader.readLine();
-                        System.out.println("Receive :" + line);
+                        if(!line.equals("null")) {
+                            System.out.println("Receive :" + line);
+                        }
                         onReceive.onReceive(line);
                     }
                     catch(Exception ex){

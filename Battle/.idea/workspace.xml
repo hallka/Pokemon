@@ -64,8 +64,8 @@
           <file leaf-file-name="MainServer.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/sample/MainServer.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="289">
-                  <caret line="137" column="80" lean-forward="true" selection-start-line="137" selection-start-column="80" selection-end-line="137" selection-end-column="80" />
+                <state relative-caret-position="89">
+                  <caret line="167" column="49" lean-forward="false" selection-start-line="167" selection-start-column="49" selection-end-line="167" selection-end-column="49" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -76,8 +76,8 @@
           <file leaf-file-name="SocketServer.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/sample/SocketServer.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-255">
-                  <caret line="16" column="38" lean-forward="true" selection-start-line="16" selection-start-column="38" selection-end-line="16" selection-end-column="38" />
+                <state relative-caret-position="289">
+                  <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -92,12 +92,12 @@
           <file leaf-file-name="MainClient.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/sample/MainClient.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="463">
-                  <caret line="174" column="0" lean-forward="false" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
+                <state relative-caret-position="323">
+                  <caret line="173" column="0" lean-forward="true" selection-start-line="173" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#6769#7737#0" expanded="true" />
-                    <element signature="e#7736#7737#0" expanded="true" />
+                    <element signature="e#5779#7707#0" expanded="true" />
+                    <element signature="e#7706#7707#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -106,8 +106,8 @@
           <file leaf-file-name="SocketClient.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/sample/SocketClient.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="162">
-                  <caret line="47" column="0" lean-forward="false" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
+                <state relative-caret-position="230">
+                  <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -173,10 +173,10 @@
         <option value="$PROJECT_DIR$/../../../trashbox_of_ソフトウェア制作/ConnectionTest/src/JabberClient.java" />
         <option value="$PROJECT_DIR$/../../../trashbox_of_ソフトウェア制作/ConnectionTest/src/JabberServer.java" />
         <option value="$PROJECT_DIR$/src/sample/OnReceiveListener.java" />
-        <option value="$PROJECT_DIR$/src/sample/SocketClient.java" />
         <option value="$PROJECT_DIR$/src/sample/SocketServer.java" />
-        <option value="$PROJECT_DIR$/src/sample/MainClient.java" />
+        <option value="$PROJECT_DIR$/src/sample/SocketClient.java" />
         <option value="$PROJECT_DIR$/src/sample/MainServer.java" />
+        <option value="$PROJECT_DIR$/src/sample/MainClient.java" />
       </list>
     </option>
   </component>
@@ -688,8 +688,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6769#7737#0" expanded="true" />
-            <element signature="e#7736#7737#0" expanded="true" />
+            <element signature="e#5779#7707#0" expanded="true" />
+            <element signature="e#7706#7707#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -755,8 +755,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6769#7737#0" expanded="true" />
-            <element signature="e#7736#7737#0" expanded="true" />
+            <element signature="e#5779#7707#0" expanded="true" />
+            <element signature="e#7706#7707#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -812,8 +812,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6769#7737#0" expanded="true" />
-            <element signature="e#7736#7737#0" expanded="true" />
+            <element signature="e#5779#7707#0" expanded="true" />
+            <element signature="e#7706#7707#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -869,8 +869,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6769#7737#0" expanded="true" />
-            <element signature="e#7736#7737#0" expanded="true" />
+            <element signature="e#5779#7707#0" expanded="true" />
+            <element signature="e#7706#7707#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -926,8 +926,8 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6769#7737#0" expanded="true" />
-            <element signature="e#7736#7737#0" expanded="true" />
+            <element signature="e#5779#7707#0" expanded="true" />
+            <element signature="e#7706#7707#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -945,8 +945,8 @@
           <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6769#7737#0" expanded="true" />
-            <element signature="e#7736#7737#0" expanded="true" />
+            <element signature="e#5779#7707#0" expanded="true" />
+            <element signature="e#7706#7707#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1126,20 +1126,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/sample/SocketClient.java">
+    <entry file="file://$PROJECT_DIR$/src/sample/SocketServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="47" column="0" lean-forward="false" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
+        <state relative-caret-position="289">
+          <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/sample/SocketServer.java">
+    <entry file="file://$PROJECT_DIR$/src/sample/SocketClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-255">
-          <caret line="16" column="38" lean-forward="true" selection-start-line="16" selection-start-column="38" selection-end-line="16" selection-end-column="38" />
+        <state relative-caret-position="230">
+          <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/sample/MainServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="89">
+          <caret line="167" column="49" lean-forward="false" selection-start-line="167" selection-start-column="49" selection-end-line="167" selection-end-column="49" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1148,22 +1158,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/sample/MainClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="463">
-          <caret line="174" column="0" lean-forward="false" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
+        <state relative-caret-position="323">
+          <caret line="173" column="0" lean-forward="true" selection-start-line="173" selection-start-column="0" selection-end-line="173" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6769#7737#0" expanded="true" />
-            <element signature="e#7736#7737#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/sample/MainServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="137" column="80" lean-forward="true" selection-start-line="137" selection-start-column="80" selection-end-line="137" selection-end-column="80" />
-          <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#5779#7707#0" expanded="true" />
+            <element signature="e#7706#7707#0" expanded="true" />
           </folding>
         </state>
       </provider>

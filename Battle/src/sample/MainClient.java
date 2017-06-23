@@ -130,34 +130,13 @@ public class MainClient extends Application
         Battle.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if(isConnect){
-
-                if(!isInited){
-                    socket.onReceive(new OnReceiveListener() {
-                        @Override
-                        public void onReceive(String str) {
-                            if (str.equals("LEFT") && t2.isRotable()) {
-                                t2.setRotLflag(true);
-                            } else if (str.equals("RIGHT") && t2.isRotable()) {
-                                t2.setRotRflag(true);
-                            } else if (t2.getCenter().isAlive()) {
-                                if (str.equals("UP") && t2.checkRefreshed()) {
-                                    t2.setAttackflag(true);
-                                } else if (str.equals("DOWN") && t2.checkItem()) {
-                                    t2.setItemflag(true);
-                                }
-                            }
-                        }
-                    });
-                    isInited = true;
-                }
-
                 if (code.equals("LEFT") && t1.isRotable()) {
-                        t1.setRotLflag(true);
-                        socket.send("LEFT");
-                    } else if (code.equals("RIGHT") && t1.isRotable()) {
-                        t1.setRotRflag(true);
-                        socket.send("RIGHT");
-                    } else if (t1.getCenter().isAlive()) {
+                    t1.setRotLflag(true);
+                    socket.send("LEFT");
+                } else if (code.equals("RIGHT") && t1.isRotable()) {
+                    t1.setRotRflag(true);
+                    socket.send("RIGHT");
+                } else if (t1.getCenter().isAlive()) {
                     if (code.equals("UP") && t1.checkRefreshed()) {
                         t1.setAttackflag(true);
                         socket.send("UP");
@@ -196,10 +175,28 @@ public class MainClient extends Application
         final long startNanoTime = System.nanoTime();
 
         //Battle Loop
-        new AnimationTimer()
-        {
-            public void handle(long currentNanoTime)
-            {
+        new AnimationTimer() {
+            public void handle(long currentNanoTime) {
+                if (!isInited && isConnect) {
+                    socket.onReceive(new OnReceiveListener() {
+                        @Override
+                        public void onReceive(String str) {
+                            if (str.equals("LEFT") && t2.isRotable()) {
+                                t2.setRotLflag(true);
+                            } else if (str.equals("RIGHT") && t2.isRotable()) {
+                                t2.setRotRflag(true);
+                            } else if (t2.getCenter().isAlive()) {
+                                if (str.equals("UP") && t2.checkRefreshed()) {
+                                    t2.setAttackflag(true);
+                                } else if (str.equals("DOWN") && t2.checkItem()) {
+                                    t2.setItemflag(true);
+                                }
+                            }
+                        }
+                    });
+                    isInited = true;
+                }
+
                 double t = (currentNanoTime - startNanoTime) / 1000000000.0;
 
                 gc.setFill( new Color(0.85, 0.85, 1.0, 1.0) );
