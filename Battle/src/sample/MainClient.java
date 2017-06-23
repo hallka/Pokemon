@@ -14,8 +14,7 @@ import javafx.animation.AnimationTimer;
 
 import java.io.*;
 
-public class MainClient extends Application
-{
+public class MainClient extends Application {
     private static int port = 54312;
     private SocketClient socket = null;
     private String host = "PC";
@@ -35,9 +34,8 @@ public class MainClient extends Application
     }
 
     @Override
-    public void start(Stage stage)
-    {
-        stage.setTitle( "Pokemon Battle @client" );
+    public void start(Stage stage) {
+        stage.setTitle("Pokemon Battle @client");
 
         this.Select(stage);
         this.Connect(stage);
@@ -49,17 +47,17 @@ public class MainClient extends Application
         stage.show();
     }
 
-    public void Select(Stage stage){
+    public void Select(Stage stage) {
         Group root = new Group();
         this.Select = new Scene(root);
         ImageView image = new ImageView("sample/start.png");
         root.getChildren().add(image);
         Select.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if(code.equals("Z")){
+            if (code.equals("Z")) {
                 stage.setScene(Battle);
                 stage.show();
-            }else if(code.equals("C")){
+            } else if (code.equals("C")) {
                 stage.setScene(Connect);
                 stage.show();
             }
@@ -72,26 +70,29 @@ public class MainClient extends Application
         ImageView image = new ImageView("sample/text_tsushin.png");
         root.getChildren().add(image);
         Connect.setOnKeyPressed(event -> {
-            if (!isConnect) {
-                socket = new SocketClient(host, port);
-                isConnect = true;
-            }else if (socket.isConnected()) {
-                stage.setScene(Battle);
-                stage.show();
+            while(true) {
+                if (!isConnect) {
+                    socket = new SocketClient(host, port);
+                    isConnect = true;
+                } else if (socket.isConnected()) {
+                    stage.setScene(Battle);
+                    stage.show();
+                    break;
+                }
             }
         });
     }
 
-    public void Battle(Stage stage){
+    public void Battle(Stage stage) {
 
         Group root = new Group();
-        this.Battle = new Scene( root );
+        this.Battle = new Scene(root);
 
         ImageView p1 = new ImageView();
         ImageView p2 = new ImageView();
 
-        Canvas canvas = new Canvas( WINDOW_WIDTH, WINDOW_HEIGHT );
-        root.getChildren().add( canvas );
+        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        root.getChildren().add(canvas);
         root.getChildren().add(p1);
         root.getChildren().add(p2);
 
@@ -126,7 +127,7 @@ public class MainClient extends Application
         //keyboard
         Battle.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if(isConnect){
+            if (isConnect) {
                 if (code.equals("LEFT") && t1.isRotable()) {
                     t1.setRotLflag(true);
                     socket.send("LEFT");
@@ -142,7 +143,7 @@ public class MainClient extends Application
                         socket.send("DOWN");
                     }
                 }
-            }else {
+            } else {
                 if (code.equals("LEFT") && t1.isRotable()) {
                     t1.setRotLflag(true);
                 } else if (code.equals("RIGHT") && t1.isRotable()) {
@@ -196,27 +197,27 @@ public class MainClient extends Application
 
                 double t = (currentNanoTime - startNanoTime) / 1000000000.0;
 
-                gc.setFill( new Color(0.85, 0.85, 1.0, 1.0) );
-                gc.fillRect(0,0, 1024,1024);
+                gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
+                gc.fillRect(0, 0, 1024, 1024);
 
                 t1.refresh(3);
                 t2.refresh(3);
 
                 //if alive, show HP
-                CheckGage(gc,t1,p2_x-50, p1_y);
-                CheckGage(gc,t2,p1_x,p2_y);
+                CheckGage(gc, t1, p2_x - 50, p1_y);
+                CheckGage(gc, t2, p1_x, p2_y);
 
                 //Check ActionFlag
-                CheckAction(t1,p1,t2);
-                CheckAction(t2,p2,t1);
+                CheckAction(t1, p1, t2);
+                CheckAction(t2, p2, t1);
 
                 //if win or lose, jump next scene
-                if(t1.isWin() || t2.checkLose()){
-                    stage.setScene( WinResult );
+                if (t1.isWin() || t2.checkLose()) {
+                    stage.setScene(WinResult);
                     stage.show();
                 }
-                if(t2.isWin() || t1.checkLose()){
-                    stage.setScene( LoseResult );
+                if (t2.isWin() || t1.checkLose()) {
+                    stage.setScene(LoseResult);
                     stage.show();
                 }
 
@@ -225,27 +226,27 @@ public class MainClient extends Application
 
     }
 
-    public void DrawGage(GraphicsContext gc, Pokemon p, double x, double y){
-        gc.setFill(new Color(0.3,0.3,0.3,1.0));
-        gc.fillRect(x, y+10, 75*5, 20);
-        gc.setFill(new Color(1.0,0.0,0,1.0));
-        gc.fillRect(x, y+10, p.getHP()*5, 20);
-        gc.setFill(new Color(0.3,0.3,0.3,1.0));
-        gc.fillRect(x, y+30, 10000*0.03, 15);
-        gc.setFill(new Color(1.0,1.0,0,1.0));
-        gc.fillRect(x, y+30, p.getRefresh()*0.03, 15);
+    public void DrawGage(GraphicsContext gc, Pokemon p, double x, double y) {
+        gc.setFill(new Color(0.3, 0.3, 0.3, 1.0));
+        gc.fillRect(x, y + 10, 75 * 5, 20);
+        gc.setFill(new Color(1.0, 0.0, 0, 1.0));
+        gc.fillRect(x, y + 10, p.getHP() * 5, 20);
+        gc.setFill(new Color(0.3, 0.3, 0.3, 1.0));
+        gc.fillRect(x, y + 30, 10000 * 0.03, 15);
+        gc.setFill(new Color(1.0, 1.0, 0, 1.0));
+        gc.fillRect(x, y + 30, p.getRefresh() * 0.03, 15);
         gc.strokeText(p.getName(), x, y);
     }
 
-    public void CheckGage(GraphicsContext gc, Trainer t, double x, double y){
-        if(t.getCenter().isAlive()) {
-            DrawGage(gc,t.getCenter(),x,y);
+    public void CheckGage(GraphicsContext gc, Trainer t, double x, double y) {
+        if (t.getCenter().isAlive()) {
+            DrawGage(gc, t.getCenter(), x, y);
         }
-        if(t.getLeft().isAlive()) {
-            DrawGage(gc,t.getLeft(),x,y+60);
+        if (t.getLeft().isAlive()) {
+            DrawGage(gc, t.getLeft(), x, y + 60);
         }
-        if(t.getRight().isAlive()) {
-            DrawGage(gc,t.getRight(),x,y+120);
+        if (t.getRight().isAlive()) {
+            DrawGage(gc, t.getRight(), x, y + 120);
         }
     }
 
@@ -253,49 +254,52 @@ public class MainClient extends Application
         t.rotL();
         p.setImage(t.getCenter().getImage());
     }
-    public void TrotR (Trainer t, ImageView p) {
+
+    public void TrotR(Trainer t, ImageView p) {
         t.rotR();
         p.setImage(t.getCenter().getImage());
     }
-    public void Attack (Trainer ta, Trainer tb) {
+
+    public void Attack(Trainer ta, Trainer tb) {
         ta.attack(tb.getCenter());
         ta.setRotable(true);
         tb.setRotable(true);
     }
-    public void UseItem (Trainer tu, Trainer to){
+
+    public void UseItem(Trainer tu, Trainer to) {
         tu.useItem();
         tu.setRotable(true);
         to.setRotable(true);
     }
 
-    public void CheckAction (Trainer tm, ImageView p, Trainer ts){
-        if(tm.getRotLflag()) {
-            TrotL(tm,p);
+    public void CheckAction(Trainer tm, ImageView p, Trainer ts) {
+        if (tm.getRotLflag()) {
+            TrotL(tm, p);
             tm.setRotLflag(false);
         }
-        if(tm.getRotRflag()) {
-            TrotR(tm,p);
+        if (tm.getRotRflag()) {
+            TrotR(tm, p);
             tm.setRotRflag(false);
         }
-        if(tm.getAttackflag()) {
-            Attack(tm,ts);
+        if (tm.getAttackflag()) {
+            Attack(tm, ts);
             tm.setAttackflag(false);
         }
-        if(tm.getItemflag()) {
-            UseItem(tm,ts);
+        if (tm.getItemflag()) {
+            UseItem(tm, ts);
             tm.setItemflag(false);
         }
     }
 
-    public void WinResult(Stage stage){
+    public void WinResult(Stage stage) {
         Group root = new Group();
         this.WinResult = new Scene(root);
         ImageView image = new ImageView("sample/pose_win_boy.png");
         root.getChildren().add(image);
         WinResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if(code.equals("Z")){
-                if(isConnect) {
+            if (code.equals("Z")) {
+                if (isConnect) {
                     socket.close();
                 }
                 Platform.exit();
@@ -303,23 +307,23 @@ public class MainClient extends Application
         });
     }
 
-    public void LoseResult(Stage stage){
+    public void LoseResult(Stage stage) {
         Group root = new Group();
         this.LoseResult = new Scene(root);
         ImageView image = new ImageView("sample/pose_lose_boy.png");
         root.getChildren().add(image);
         LoseResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if(code.equals("Z")){
-                if(isConnect) {
+            if (code.equals("Z")) {
+                if (isConnect) {
                     socket.close();
                 }
                 Platform.exit();
             }
         });
     }
-    public static void main(String[] args)
-    {
+
+    public static void main(String[] args) {
         launch(args);
     }
 
