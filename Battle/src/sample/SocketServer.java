@@ -70,4 +70,7 @@ public class SocketServer {
         }
     }
 
+    public boolean isConnected(){
+        return socket.isConnected();
+    }
 }

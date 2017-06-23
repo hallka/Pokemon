@@ -68,4 +68,7 @@ public class SocketClient {
         }
     }
 
+    public boolean isConnected(){
+        return socket.isConnected();
+    }
 }

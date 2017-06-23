@@ -18,7 +18,6 @@ public class MainServer extends Application
     static int port = 54312;
     private SocketServer socket;
     private Boolean isConnect = false;
-    private Boolean isReady = false;
     private Boolean isInited = false;
 
     private Scene Select = null;
@@ -67,11 +66,10 @@ public class MainServer extends Application
         ImageView image = new ImageView("sample/text_tsushin.png");
         root.getChildren().add(image);
         Connect.setOnKeyPressed(event -> {
-            if(!isConnect){
+            if (!isConnect) {
                 socket = new SocketServer(port);
-                isReady = true;
                 isConnect = true;
-            }else if(isReady){
+            } else if (socket.isConnected()) {
                 stage.setScene(Battle);
                 stage.show();
             }
