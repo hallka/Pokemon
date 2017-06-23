@@ -1,5 +1,6 @@
 package sample;
 
+import java.io.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
@@ -12,16 +13,12 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.animation.AnimationTimer;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-
 public class MainServer extends Application
 {
-    static final int PORT = 54312;
-    ServerSocket s = null;
-    Socket socket = null;
-    Boolean isConnect = false;
+    static int port = 54312;
+    private SocketServer socket;
+    public Boolean isConnect = false;
+    public Boolean isReady = false;
 
     private Scene Select = null;
     private Scene Connect = null;
@@ -33,8 +30,7 @@ public class MainServer extends Application
     private static int WINDOW_HEIGHT = 1024;
 
     @Override
-    public void start(Stage stage)
-    {
+    public void start(Stage stage){
         stage.setTitle( "Pokemon Battle @server" );
 
         this.Select(stage);
@@ -70,25 +66,22 @@ public class MainServer extends Application
         ImageView image = new ImageView("sample/text_tsushin.png");
         root.getChildren().add(image);
         Connect.setOnKeyPressed(event -> {
-            try {
-                s = new ServerSocket(PORT);
-                socket = s.accept();
-                try {
-                    PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                    out.print(1);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    if (in.read() == 1) {
-                        System.out.println("Started: " + s);
-                        isConnect = true;
-                        stage.setScene(Battle);
-                        stage.show();
+            if(!isConnect){
+                socket = new SocketServer(port);
+                socket.onReceive(new OnReceiveListener() {
+                    @Override
+                    public void onReceive(String received) {
+                        System.out.println("Connection Establishing");
+                        isReady = true;
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }catch (IOException e){
-                e.printStackTrace();
+                });
+                isConnect = true;
+            }else if(isReady){
+                isReady = false;
+                stage.setScene(Battle);
+                stage.show();
             }
+            socket.send("Ping");
         });
     }
 
@@ -137,26 +130,41 @@ public class MainServer extends Application
         Battle.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if(isConnect) {
-                try {
-                    PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                    if (code.equals("LEFT") && t1.isRotable()) {
-                        t1.setRotLflag(true);
-                        out.print(4);
-                    } else if (code.equals("RIGHT") && t1.isRotable()) {
-                        t1.setRotRflag(true);
-                        out.print(6);
-                    } else if (t1.getCenter().isAlive()) {
-                        if (code.equals("UP") && t1.checkRefreshed()) {
-                            t1.setAttackflag(true);
-                            out.print(8);
-                        } else if (code.equals("DOWN") && t1.checkItem()) {
-                            t1.setItemflag(true);
-                            out.print(2);
-                        }
-                    }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(!isReady){
+                    socket.onReceive(new OnReceiveListener() {
+                        @Override
+                        public void onReceive(String str) {
+                            if (str.equals("LEFT") && t2.isRotable()) {
+                                t2.setRotLflag(true);
+                            } else if (str.equals("RIGHT") && t2.isRotable()) {
+                                t2.setRotRflag(true);
+                            } else if (t2.getCenter().isAlive()) {
+                                if (str.equals("UP") && t2.checkRefreshed()) {
+                                    t2.setAttackflag(true);
+                                } else if (str.equals("DOWN") && t2.checkItem()) {
+                                    t2.setItemflag(true);
+                                }
+                            }
+                        }
+                    });
+                    isReady = true;
+                }
+
+                if (code.equals("LEFT") && t1.isRotable()) {
+                    t1.setRotLflag(true);
+                    socket.send("LEFT");
+                } else if (code.equals("RIGHT") && t1.isRotable()) {
+                    t1.setRotRflag(true);
+                    socket.send("RIGHT");
+                } else if (t1.getCenter().isAlive()) {
+                    if (code.equals("UP") && t1.checkRefreshed()) {
+                        t1.setAttackflag(true);
+                        socket.send("UP");
+                    } else if (code.equals("DOWN") && t1.checkItem()) {
+                        t1.setItemflag(true);
+                        socket.send("DOWN");
+                    }
                 }
             }else {
                 if (code.equals("LEFT") && t1.isRotable()) {
@@ -186,7 +194,6 @@ public class MainServer extends Application
         });
 
         final long startNanoTime = System.nanoTime();
-
         //Battle Loop
         new AnimationTimer()
         {
@@ -203,25 +210,6 @@ public class MainServer extends Application
                 //if alive, show HP
                 CheckGage(gc,t1,p2_x-50, p1_y);
                 CheckGage(gc,t2,p1_x,p2_y);
-
-                if(isConnect) {
-                    try {
-                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                        if (in.read() == 4 && t2.isRotable()) {
-                            t2.setRotLflag(true);
-                        } else if (in.read() == 6 && t2.isRotable()) {
-                            t2.setRotRflag(true);
-                        } else if (t2.getCenter().isAlive()) {
-                            if (in.read() == 8 && t2.checkRefreshed()) {
-                                t2.setAttackflag(true);
-                            } else if (in.read() == 2 && t2.checkItem()) {
-                                t2.setItemflag(true);
-                            }
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
 
                 //Check ActionFlag
                 CheckAction(t1,p1,t2);
@@ -312,7 +300,6 @@ public class MainServer extends Application
         if(isConnect) {
             try {
                 socket.close();
-                s.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -333,7 +320,6 @@ public class MainServer extends Application
         if(isConnect) {
             try {
                 socket.close();
-                s.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
