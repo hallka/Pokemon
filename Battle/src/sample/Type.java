@@ -4,6 +4,11 @@ import java.util.HashMap;
 
 /**
  * Created by you on 2017/05/26.
+ *
+ * Type list
+ *
+ * The list, aff returns effect
+ * Use like [Type of attack side][Type of damage side]
  */
 public class Type {
     static double[][] aff;

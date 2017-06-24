@@ -15,12 +15,14 @@ import javafx.scene.image.Image;
 import javafx.animation.AnimationTimer;
 
 public class MainServer extends Application {
+    //Param of connection
     static int port = 54312;
     private SocketServer socket;
     private Boolean isConnect = false;
     private Boolean isInited = false;
 
-    private Scene Select = null;
+
+    private Scene ModeSelect = null;
     private Scene Connect = null;
     private Scene Battle = null;
     private Scene WinResult = null;
@@ -33,22 +35,22 @@ public class MainServer extends Application {
     public void start(Stage stage) {
         stage.setTitle("Pokemon Battle @server");
 
-        this.Select(stage);
+        this.ModeSelect(stage);
         this.Connect(stage);
         this.Battle(stage);
         this.LoseResult(stage);
         this.WinResult(stage);
 
-        stage.setScene(Select);
+        stage.setScene(ModeSelect);
         stage.show();
     }
 
-    public void Select(Stage stage) {
+    public void ModeSelect(Stage stage) {
         Group root = new Group();
-        this.Select = new Scene(root);
+        this.ModeSelect = new Scene(root);
         ImageView image = new ImageView("sample/start.png");
         root.getChildren().add(image);
-        Select.setOnKeyPressed(event -> {
+        ModeSelect.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if (code.equals("Z")) {
                 stage.setScene(Battle);
@@ -63,6 +65,11 @@ public class MainServer extends Application {
     public void Connect(Stage stage) {
         Group root = new Group();
         this.Connect = new Scene(root);
+        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        root.getChildren().add(canvas);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
+        gc.fillRect(0, 0, 1024, 1024);
         ImageView image = new ImageView("sample/text_tsushin.png");
         root.getChildren().add(image);
         Connect.setOnKeyPressed(event -> {
@@ -71,6 +78,24 @@ public class MainServer extends Application {
                     socket = new SocketServer(port);
                     isConnect = true;
                 } else if (socket.isConnected()) {
+                    gc.drawImage(new Image("sample/number_3.png"), 768, 0);
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    gc.drawImage(new Image("sample/number_2.png"), 768, 768);
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    gc.drawImage(new Image("sample/number_1.png"), 0, 768);
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     stage.setScene(Battle);
                     stage.show();
                     break;
@@ -100,12 +125,9 @@ public class MainServer extends Application {
         Trainer t1 = new Trainer(new MT(), new yamata(), new darkelf());
         Trainer t2 = new Trainer(new MT(), new seiryu(), new dragon());
 
-        t1.getCenter().setItem(new Heal("mazai", 30));
-        t1.getRight().setItem(new Heal("mazai", 30));
-        t1.getLeft().setItem(new Heal("mazai", 30));
-        t2.getRight().setItem(new Heal("mazai", 30));
-        t2.getCenter().setItem(new Heal("mazai", 30));
-        t2.getLeft().setItem(new Heal("mazai", 30));
+        t1.setItem(new Mazai(), new Aburasoba(), new Coffee());
+        t2.setItem(new Coffee(), new Aburasoba(), new Coffee());
+
         p1.setImage(t1.getCenter().getImage());
         p2.setImage(t2.getCenter().getImage());
 
@@ -171,6 +193,7 @@ public class MainServer extends Application {
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
                 if (isConnect && !isInited) {
+                    //Message Receive init
                     socket.onReceive(new OnReceiveListener() {
                         @Override
                         public void onReceive(String str) {

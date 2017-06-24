@@ -21,15 +21,15 @@ public class Trainer {
         setRight(right);
     }
 
-    public void setCenter(Pokemon center) {
+    private void setCenter(Pokemon center) {
         this.center = center;
     }
 
-    public void setLeft(Pokemon left) {
+    private void setLeft(Pokemon left) {
         this.left = left;
     }
 
-    public void setRight(Pokemon right) {
+    private void setRight(Pokemon right) {
         this.right = right;
     }
 
@@ -126,6 +126,12 @@ public class Trainer {
             setLeft(p);
             setRotable(false);
         }
+    }
+
+    public void setItem(Item litem, Item citem, Item ritem){
+        this.left.setItem(litem);
+        this.center.setItem(citem);
+        this.right.setItem(ritem);
     }
 
     public void useItem(){

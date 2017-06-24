@@ -24,7 +24,7 @@ abstract class Pokemon {
         setImage(image);
     }
 
-    public void setName(String name){
+    private void setName(String name){
         this.name = name;
     }
 
@@ -32,7 +32,7 @@ abstract class Pokemon {
         return name;
     }
 
-    public void setStatus(int HP, int ATK, int AGI, int COST, String type){
+    private void setStatus(int HP, int ATK, int AGI, int COST, String type){
         this.HP = HP;
         this.ATK = ATK;
         this.AGI = AGI;
@@ -48,8 +48,16 @@ abstract class Pokemon {
         return this.HP;
     }
 
+    public void setATK(int ATK) {
+        this.ATK = ATK;
+    }
+
     public int getATK(){
         return this.ATK;
+    }
+
+    public void setAGI(int AGI) {
+        this.AGI = AGI;
     }
 
     public int getAGI(){
@@ -60,11 +68,15 @@ abstract class Pokemon {
         return this.COST;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getType(){
         return this.type;
     }
 
-    public void setImage(Image image){
+    private void setImage(Image image){
         this.image = image;
     }
 
