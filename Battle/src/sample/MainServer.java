@@ -20,7 +20,8 @@ public class MainServer extends Application {
     private SocketServer socket;
     private Boolean isConnect = false;
     private Boolean isInited = false;
-
+    private Boolean isReady = false;
+    private Boolean isFinish = false;
 
     private Scene ModeSelect = null;
     private Scene Connect = null;
@@ -56,6 +57,7 @@ public class MainServer extends Application {
                 stage.setScene(Battle);
                 stage.show();
             } else if (code.equals("C")) {
+                isConnect = true;
                 stage.setScene(Connect);
                 stage.show();
             }
@@ -65,43 +67,23 @@ public class MainServer extends Application {
     public void Connect(Stage stage) {
         Group root = new Group();
         this.Connect = new Scene(root);
-        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
-        root.getChildren().add(canvas);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
-        gc.fillRect(0, 0, 1024, 1024);
         ImageView image = new ImageView("sample/text_tsushin.png");
         root.getChildren().add(image);
-        Connect.setOnKeyPressed(event -> {
-            while(true) {
-                if (!isConnect) {
-                    socket = new SocketServer(port);
-                    isConnect = true;
-                } else if (socket.isConnected()) {
-                    gc.drawImage(new Image("sample/number_3.png"), 768, 0);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        new AnimationTimer() {
+            public void handle(long currentNanoTime) {
+                if(!isInited) {
+                    if (isConnect && !isReady) {
+                        socket = new SocketServer(port);
+                        isReady = true;
                     }
-                    gc.drawImage(new Image("sample/number_2.png"), 768, 768);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    if (isReady && socket.isConnected()) {
+                        stage.setScene(Battle);
+                        stage.show();
                     }
-                    gc.drawImage(new Image("sample/number_1.png"), 0, 768);
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    stage.setScene(Battle);
-                    stage.show();
-                    break;
                 }
             }
-        });
+        }.start();
+
     }
 
     public void Battle(Stage stage) {
@@ -192,53 +174,57 @@ public class MainServer extends Application {
         //Battle Loop
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if (isConnect && !isInited) {
-                    //Message Receive init
-                    socket.onReceive(new OnReceiveListener() {
-                        @Override
-                        public void onReceive(String str) {
-                            if (str.equals("LEFT") && t2.isRotable()) {
-                                t2.setRotLflag(true);
-                            } else if (str.equals("RIGHT") && t2.isRotable()) {
-                                t2.setRotRflag(true);
-                            } else if (t2.getCenter().isAlive()) {
-                                if (str.equals("UP") && t2.checkRefreshed()) {
-                                    t2.setAttackflag(true);
-                                } else if (str.equals("DOWN") && t2.checkItem()) {
-                                    t2.setItemflag(true);
+                if(!isFinish) {
+                    if (isConnect && !isInited) {
+                        //Message Receive init
+                        socket.onReceive(new OnReceiveListener() {
+                            @Override
+                            public void onReceive(String str) {
+                                if (str.equals("LEFT") && t2.isRotable()) {
+                                    t2.setRotLflag(true);
+                                } else if (str.equals("RIGHT") && t2.isRotable()) {
+                                    t2.setRotRflag(true);
+                                } else if (t2.getCenter().isAlive()) {
+                                    if (str.equals("UP") && t2.checkRefreshed()) {
+                                        t2.setAttackflag(true);
+                                    } else if (str.equals("DOWN") && t2.checkItem()) {
+                                        t2.setItemflag(true);
+                                    }
                                 }
                             }
-                        }
-                    });
-                    isInited = true;
+                        });
+                        isInited = true;
+                    }
+
+                    double t = (currentNanoTime - startNanoTime) / 1000000000.0;
+
+                    gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
+                    gc.fillRect(0, 0, 1024, 1024);
+
+                    t1.refresh(3);
+                    t2.refresh(3);
+
+                    //if alive, show HP
+                    CheckGage(gc, t1, p2_x - 50, p1_y);
+                    CheckGage(gc, t2, p1_x, p2_y);
+
+                    //Check ActionFlag
+                    CheckAction(t1, p1, t2);
+                    CheckAction(t2, p2, t1);
+
+                    //if win or lose, jump next scene
+                    if (t1.isWin() || t2.checkLose()) {
+                        isFinish = true;
+                        stage.setScene(WinResult);
+                        stage.show();
+                    }
+                    if (t2.isWin() || t1.checkLose()) {
+                        isFinish = true;
+                        stage.setScene(LoseResult);
+                        stage.show();
+                    }
+
                 }
-
-                double t = (currentNanoTime - startNanoTime) / 1000000000.0;
-
-                gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
-                gc.fillRect(0, 0, 1024, 1024);
-
-                t1.refresh(3);
-                t2.refresh(3);
-
-                //if alive, show HP
-                CheckGage(gc, t1, p2_x - 50, p1_y);
-                CheckGage(gc, t2, p1_x, p2_y);
-
-                //Check ActionFlag
-                CheckAction(t1, p1, t2);
-                CheckAction(t2, p2, t1);
-
-                //if win or lose, jump next scene
-                if (t1.isWin() || t2.checkLose()) {
-                    stage.setScene(WinResult);
-                    stage.show();
-                }
-                if (t2.isWin() || t1.checkLose()) {
-                    stage.setScene(LoseResult);
-                    stage.show();
-                }
-
             }
         }.start();
 

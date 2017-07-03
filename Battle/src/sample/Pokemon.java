@@ -128,15 +128,15 @@ abstract class Pokemon {
 
 }
 
-class MHM extends Pokemon {
-    public MHM (){
-        super("MentalHealthMan",100, 10, 30, 5, "BLACK", new Image("sample/mental_health_man.png"));
+class chimaira extends Pokemon {
+    public chimaira (){
+        super("Chimaira",100, 10, 30, 5, "BLACK", new Image("sample/character_kimera_chimaira.png"));
     }
 }
 
-class MNM extends Pokemon {
-    public MNM (){
-        super("MusicNoriNoriMan",50, 20, 60, 3, "WHITE", new Image("sample/music_norinori_man.png"));
+class medusa extends Pokemon {
+    public medusa (){
+        super("Medusa",50, 20, 60, 3, "WHITE", new Image("sample/fantasy_medusa.png"));
     }
 }
 
@@ -146,15 +146,15 @@ class darkelf extends Pokemon {
     }
 }
 
-class succubus extends Pokemon {
-    public succubus (){
-        super("Succubus",70, 2, 25, 4, "RED", new Image("sample/fantasy_succubus.png"));
+class kyubi extends Pokemon {
+    public kyubi (){
+        super("Kyubi",70, 2, 25, 4, "RED", new Image("sample/youkai_kyubinokitsune.png"));
     }
 }
 
-class KM extends Pokemon {
-    public KM (){
-        super("KenkenMan",50, 10, 5, 1, "GREEN", new Image("sample/kataashidachi_man.png"));
+class cthulhu extends Pokemon {
+    public cthulhu (){
+        super("Cthulhu",50, 10, 5, 1, "GREEN", new Image("sample/character_cthulhu_kuturufu.png"));
     }
 }
 
