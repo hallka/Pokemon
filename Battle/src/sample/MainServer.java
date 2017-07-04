@@ -18,9 +18,9 @@ public class MainServer extends Application {
     //Param of connection
     static int port = 54312;
     private SocketServer socket;
-    private Boolean isConnect = false;
-    private Boolean isInited = false;
-    private Boolean isReady = false;
+    private Boolean isConnect = false; //Whether to build connection or not
+    private Boolean isInited = false; //Whether to be initialized to PvP battle or not
+    private Boolean isReady = false; //Whether to be ready to build connection or not
     private Boolean isFinish = false;
 
     private Scene ModeSelect = null;
@@ -71,6 +71,7 @@ public class MainServer extends Application {
         root.getChildren().add(image);
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
+                image.setImage(new Image("sample/text_tsushin.png"));
                 if(!isInited) {
                     if (isConnect && !isReady) {
                         socket = new SocketServer(port);
@@ -191,6 +192,7 @@ public class MainServer extends Application {
                                         t2.setItemflag(true);
                                     }
                                 }
+
                             }
                         });
                         isInited = true;
@@ -304,6 +306,7 @@ public class MainServer extends Application {
             String code = event.getCode().toString();
             if (code.equals("Z")) {
                 if (isConnect) {
+                    socket.send("CLOSE");
                     socket.close();
                 }
                 Platform.exit();
@@ -319,10 +322,7 @@ public class MainServer extends Application {
 
         LoseResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if (code.equals("Z")) {
-                if (isConnect) {
-                    socket.close();
-                }
+            if (code.equals("Z") && !isConnect) {
                 Platform.exit();
             }
         });

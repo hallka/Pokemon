@@ -70,10 +70,11 @@ public class MainClient extends Application {
     public void Connect(Stage stage) {
         Group root = new Group();
         this.Connect = new Scene(root);
-        ImageView image = new ImageView("sample/text_tsushin.png");
+        ImageView image = new ImageView();
         root.getChildren().add(image);
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
+                image.setImage(new Image("sample/text_tsushin.png"));
                 if(!isInited) {
                     if (isConnect && !isReady) {
                         socket = new SocketClient(host, port);
@@ -306,6 +307,7 @@ public class MainClient extends Application {
             String code = event.getCode().toString();
             if (code.equals("Z")) {
                 if (isConnect) {
+                    socket.send("CLOSE");
                     socket.close();
                 }
                 Platform.exit();
@@ -320,10 +322,7 @@ public class MainClient extends Application {
         root.getChildren().add(image);
         LoseResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if (code.equals("Z")) {
-                if (isConnect) {
-                    socket.close();
-                }
+            if (code.equals("Z") && !isConnect) {
                 Platform.exit();
             }
         });

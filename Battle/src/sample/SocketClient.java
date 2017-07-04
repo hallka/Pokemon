@@ -7,6 +7,7 @@ import java.net.Socket;
 /**
  * Created by you on 2017/06/22.
  */
+
 public class SocketClient {
     private Socket socket;
     private InetAddress addr;
