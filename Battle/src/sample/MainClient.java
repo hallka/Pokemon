@@ -219,11 +219,27 @@ public class MainClient extends Application {
                     //if win or lose, jump next scene
                     if (t1.isWin() || t2.checkLose()) {
                         isFinish = true;
+                        if (isConnect) {
+                            while(true) {
+                                if(!socket.isClosed()) {
+                                    socket.close();
+                                }else{
+                                    break;
+                                }
+                            }
+                        }
                         stage.setScene(WinResult);
                         stage.show();
                     }
                     if (t2.isWin() || t1.checkLose()) {
                         isFinish = true;
+                        if(isConnect) {
+                            while (true) {
+                                if (socket.isClosed()) {
+                                    break;
+                                }
+                            }
+                        }
                         stage.setScene(LoseResult);
                         stage.show();
                     }
@@ -306,10 +322,6 @@ public class MainClient extends Application {
         WinResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if (code.equals("Z")) {
-                if (isConnect) {
-                    socket.send("CLOSE");
-                    socket.close();
-                }
                 Platform.exit();
             }
         });
@@ -322,7 +334,7 @@ public class MainClient extends Application {
         root.getChildren().add(image);
         LoseResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if (code.equals("Z") && !isConnect) {
+            if (code.equals("Z")) {
                 Platform.exit();
             }
         });

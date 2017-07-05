@@ -50,6 +50,11 @@ public class SocketClient {
                         if(!line.equals("null")) {
                             System.out.println("Receive :" + line);
                         }
+                        if(line.equals("CLOSE")){
+                            CloseFlag = true;
+                            socket.close();
+                            break;
+                        }
                         onReceive.onReceive(line);
                     }
                     catch(Exception ex){
@@ -63,6 +68,7 @@ public class SocketClient {
     public void close(){
         try {
             CloseFlag = true;
+            this.send("CLOSE");
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,5 +77,8 @@ public class SocketClient {
 
     public boolean isConnected(){
         return socket.isConnected();
+    }
+    public boolean isClosed(){
+        return socket.isClosed();
     }
 }
