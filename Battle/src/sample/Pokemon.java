@@ -132,11 +132,20 @@ class chimaira extends Pokemon {
     public chimaira (){
         super("Chimaira",100, 10, 30, 5, "BLACK", new Image("sample/character_kimera_chimaira.png"));
     }
+    public chimaira (Item item)
+    {
+        super("Chimaira",100, 10, 30, 5, "BLACK", new Image("sample/character_kimera_chimaira.png"));
+        this.setItem(item);
+    }
 }
 
 class medusa extends Pokemon {
     public medusa (){
         super("Medusa",50, 20, 60, 3, "WHITE", new Image("sample/fantasy_medusa.png"));
+    }
+    public medusa (Item item){
+        super("Medusa",50, 20, 60, 3, "WHITE", new Image("sample/fantasy_medusa.png"));
+        this.setItem(item);
     }
 }
 
@@ -144,11 +153,19 @@ class darkelf extends Pokemon {
     public darkelf (){
         super("DarkElf", 40, 15, 60, 4, "BLACK", new Image("sample/fantasy_dark_elf.png"));
     }
+    public darkelf (Item item){
+        super("DarkElf", 40, 15, 60, 4, "BLACK", new Image("sample/fantasy_dark_elf.png"));
+        this.setItem(item);
+    }
 }
 
 class kyubi extends Pokemon {
     public kyubi (){
         super("Kyubi",70, 2, 25, 4, "RED", new Image("sample/youkai_kyubinokitsune.png"));
+    }
+    public kyubi (Item item){
+        super("Kyubi",70, 2, 25, 4, "RED", new Image("sample/youkai_kyubinokitsune.png"));
+        this.setItem(item);
     }
 }
 
@@ -156,11 +173,20 @@ class cthulhu extends Pokemon {
     public cthulhu (){
         super("Cthulhu",50, 10, 5, 1, "GREEN", new Image("sample/character_cthulhu_kuturufu.png"));
     }
+    public cthulhu (Item item)
+    {
+        super("Cthulhu",50, 10, 5, 1, "GREEN", new Image("sample/character_cthulhu_kuturufu.png"));
+        this.setItem(item);
+    }
 }
 
 class MT extends Pokemon {
     public MT (){
         super("ThunderMagician",60, 90, 2, 8, "GREEN", new Image("sample/mahoutsukai_thunder.png"));
+    }
+    public MT (Item item){
+        super("ThunderMagician",60, 90, 2, 8, "GREEN", new Image("sample/mahoutsukai_thunder.png"));
+        this.setItem(item);
     }
 }
 
@@ -168,10 +194,21 @@ class seiryu extends Pokemon {
     public seiryu (){
         super("BlueDragon",100, 80, 10, 18, "BLUE", new Image("sample/fantasy_seiryu.png"));
     }
+    public seiryu (Item item)
+    {
+        super("BlueDragon",100, 80, 10, 18, "BLUE", new Image("sample/fantasy_seiryu.png"));
+        this.setItem(item);
+    }
 }
+
 class unicorn extends Pokemon {
     public unicorn (){
         super("Unicorn",60, 35, 4, 8, "WHITE", new Image("sample/fantasy_unicorn.png"));
+    }
+    public unicorn (Item item)
+    {
+        super("Unicorn",60, 35, 4, 8, "WHITE", new Image("sample/fantasy_unicorn.png"));
+        this.setItem(item);
     }
 }
 
@@ -179,10 +216,19 @@ class dragon extends Pokemon {
     public dragon (){
         super("RedDragon",150, 20, 5, 8, "RED", new Image("sample/fantasy_dragon.png"));
     }
+    public dragon (Item item){
+        super("RedDragon",150, 20, 5, 8, "RED", new Image("sample/fantasy_dragon.png"));
+        this.setItem(item);
+
+    }
 }
 
 class yamata extends Pokemon {
     public yamata (){
         super("YamataNoOrothi",40, 80, 4, 10, "BLUE", new Image("sample/fantasy_yamata.png"));
+    }
+    public yamata (Item item){
+        super("YamataNoOrothi",40, 80, 4, 10, "BLUE", new Image("sample/fantasy_yamata.png"));
+        this.setItem(item);
     }
 }

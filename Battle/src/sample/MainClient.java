@@ -15,16 +15,31 @@ import javafx.animation.AnimationTimer;
 import java.io.*;
 
 public class MainClient extends Application {
-    private static int port = 54312;
-    private SocketClient socket = null;
+    private static int port1 = 54312;
+    private SocketClient socket1 = null;
     private String host = "PC";
-    private Boolean isConnect = false;
+    private Boolean isConnect1 = false;
+    private Boolean isConnect2 = false;
     private Boolean isInited = false;
     private Boolean isReady = false;
-    private Boolean isFinish = false;
+    private Boolean isFinish1 = false;
+    private Boolean isFinish2 = false;
 
-    private Scene ModeSelect = null;
+    private Trainer t1 = null;
+    private Trainer t2 = null;
+    private Pokemon[] plist = {new chimaira(new Mazai()), new medusa(new Mazai()), new darkelf(new Mazai()), new kyubi(new Mazai()), new cthulhu(new Mazai()), new MT(new Mazai()), new seiryu(new Mazai()), new unicorn(new Mazai()), new dragon(new Mazai()), new yamata(new Mazai())};
+    private Boolean[] isUsed = {false,false,false,false,false,false,false,false,false,false};
+    private int[] reserve1 = {-1, -1, -1};
+    private int[] reserve2 = {-1, -1, -1};
+    private int cnt1 = 0;
+    private int ptr1 = 0;
+    private int cnt2 = 0;
+    private int ptr2 = 0;
+
+    private Scene Top = null;
     private Scene Connect = null;
+    private Scene CharaSelect = null;
+    private Scene Ready = null;
     private Scene Battle = null;
     private Scene WinResult = null;
     private Scene LoseResult = null;
@@ -39,28 +54,27 @@ public class MainClient extends Application {
     public void start(Stage stage) {
         stage.setTitle("Pokemon Battle @client");
 
-        this.ModeSelect(stage);
+        this.Top(stage);
         this.Connect(stage);
+        this.CharaSelect(stage);
+        this.Ready(stage);
         this.Battle(stage);
         this.LoseResult(stage);
         this.WinResult(stage);
 
-        stage.setScene(ModeSelect);
+        stage.setScene(Top);
         stage.show();
     }
 
-    public void ModeSelect(Stage stage) {
+    public void Top(Stage stage) {
         Group root = new Group();
-        this.ModeSelect = new Scene(root);
+        this.Top = new Scene(root);
         ImageView image = new ImageView("sample/start.png");
         root.getChildren().add(image);
-        ModeSelect.setOnKeyPressed(event -> {
+        Top.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if (code.equals("Z")) {
-                stage.setScene(Battle);
-                stage.show();
-            } else if (code.equals("C")) {
-                isConnect = true;
+            if (code.equals("C")) {
+                isConnect1 = true;
                 stage.setScene(Connect);
                 stage.show();
             }
@@ -70,17 +84,220 @@ public class MainClient extends Application {
     public void Connect(Stage stage) {
         Group root = new Group();
         this.Connect = new Scene(root);
-        ImageView image = new ImageView();
+        ImageView image = new ImageView("sample/text_tsushin.png");
         root.getChildren().add(image);
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                image.setImage(new Image("sample/text_tsushin.png"));
                 if(!isInited) {
-                    if (isConnect && !isReady) {
-                        socket = new SocketClient(host, port);
+                    if (isConnect1 && !isReady) {
+                        socket1 = new SocketClient(host, port1);
                         isReady = true;
                     }
-                    if (isReady && socket.isConnected()) {
+                    if (isReady && socket1.isConnected()) {
+                        stage.setScene(CharaSelect);
+                        stage.show();
+                    }
+                }
+            }
+        }.start();
+    }
+
+    public void CharaSelect(Stage stage) {
+
+        Group root = new Group();
+        this.CharaSelect = new Scene(root);
+
+        ImageView p1 = new ImageView();
+        ImageView p2 = new ImageView();
+
+        Canvas canvas = new Canvas(WINDOW_WIDTH, WINDOW_HEIGHT);
+        root.getChildren().add(canvas);
+        root.getChildren().add(p1);
+        root.getChildren().add(p2);
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        Image damage = new Image("sample/damage.png");
+
+        double p1_x = 40;
+        double p1_y = 480;
+
+        double p2_x = 500;
+        double p2_y = 20;
+
+        p1.setX(p1_x);
+        p1.setY(p1_y);
+        p2.setX(p2_x);
+        p2.setY(p2_y);
+
+        //keyboard
+        CharaSelect.setOnKeyPressed(event -> {
+            String str = event.getCode().toString();
+            if(str.equals("DOWN")){
+                socket1.send("DOWN");
+                if(ptr1<3) {
+                    cnt1++;
+                    while (true) {
+                        if (cnt1 > 9) cnt1 = 0;
+                        if (isUsed[cnt1]) {
+                            cnt1++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }else if(str.equals("UP")){
+                socket1.send("UP");
+                if(ptr1<3) {
+                    cnt1--;
+                    while (true) {
+                        if (cnt1 < 0) cnt1 = 9;
+                        if (isUsed[cnt1]) {
+                            cnt1--;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }else if(str.equals("Z")){
+                socket1.send("SELECT");
+                if(ptr1<3) {
+                    if (!isUsed[cnt1]) {
+                        isUsed[cnt1] = true;
+                        reserve1[ptr1] = cnt1;
+                        ptr1++;
+                    }
+                }
+            }else if(str.equals("C")){
+                socket1.send("BACK");
+                if(ptr1 > 0) {
+                    ptr1--;
+                    isUsed[reserve1[ptr1]] = false;
+                    reserve1[ptr1] = -1;
+                }
+            }
+        });
+
+        final long startNanoTime = System.nanoTime();
+
+        //Battle Loop
+        new AnimationTimer() {
+            public void handle(long currentNanoTime) {
+                if(!isFinish1) {
+                    //Message Receive init
+                    if (isConnect1 && !isInited) {
+                        socket1.onReceive(new OnReceiveListener() {
+                            @Override
+                            public void onReceive(String str) {
+                                if(str.equals("DOWN")){
+                                    if(ptr2 < 3) {
+                                        cnt2++;
+                                        while (true) {
+                                            if (cnt2 > 9) cnt2 = 0;
+                                            if (isUsed[cnt2]) {
+                                                cnt2++;
+                                            } else {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }else if(str.equals("UP")){
+                                    if(ptr2 < 3) {
+                                        cnt2--;
+                                        while (true) {
+                                            if (cnt2 < 0) cnt2 = 9;
+                                            if (isUsed[cnt2]) {
+                                                cnt2--;
+                                            } else {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }else if(str.equals("SELECT")){
+                                    if(ptr2<3) {
+                                        if (!isUsed[cnt2]) {
+                                            isUsed[cnt2] = true;
+                                            reserve2[ptr2] = cnt2;
+                                            ptr2++;
+                                        }
+                                    }
+                                }else if(str.equals("BACK")){
+                                    if(ptr2 > 0) {
+                                        ptr2--;
+                                        isUsed[reserve2[ptr2]] = false;
+                                        reserve2[ptr2] = -1;
+                                    }
+                                }
+
+                            }
+                        });
+                        isInited = true;
+                    }
+
+                    double t = (currentNanoTime - startNanoTime) / 1000000000.0;
+
+                    gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
+                    gc.fillRect(0, 0, 1024, 1024);
+
+                    p1.setImage(plist[cnt1].getImage());
+                    p2.setImage(plist[cnt2].getImage());
+
+                    CheckName1(gc, p2_x - 50, p1_y);
+                    CheckName2(gc, p1_x, p2_y);
+
+                    if(ptr1 == 3 && ptr2 == 3){
+                        t1 = new Trainer(plist[reserve1[1]],plist[reserve1[0]],plist[reserve1[2]]);
+                        t2 = new Trainer(plist[reserve2[1]],plist[reserve2[0]],plist[reserve2[2]]);
+                        isFinish1 = true;
+                        //socket1.close();
+                        stage.setScene(Ready);
+                        stage.show();
+                    }
+
+                }
+            }
+        }.start();
+
+    }
+
+    public void DrawName(GraphicsContext gc, Pokemon p, double x, double y) {
+        gc.strokeText(p.getName() + "(" + p.getItem().getName() + ")", x, y);
+    }
+
+    public void CheckName1(GraphicsContext gc, double x, double y) {
+        for(int i = 0;i<ptr1;i++) {
+            if(reserve1[i] != -1) DrawName(gc, plist[reserve1[i]], x, y+i*30);
+        }
+    }
+
+    public void CheckName2(GraphicsContext gc, double x, double y) {
+        for(int i = 0;i<ptr2;i++) {
+            if(reserve2[i] != -1) DrawName(gc, plist[reserve2[i]], x, y+i*30);
+        }
+    }
+
+    public void Ready(Stage stage) {
+        Group root = new Group();
+        this.Ready = new Scene(root);
+        ImageView image = new ImageView("sample/text_tsushin.png");
+        root.getChildren().add(image);
+        new AnimationTimer() {
+            public void handle(long currentNanoTime) {
+                if(isConnect1 && isFinish1) {
+                    if(socket1.isClosed()) {
+                        socket1 = new SocketClient(host,port1);
+                        isConnect2 = true;
+                    }else if(socket1.isConnected()){
+                        try {
+                            Thread.sleep(150);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        socket1.close();
+                    }
+                    isConnect2 = true;
+                    if (isConnect2) {
+                        isInited = false;
                         stage.setScene(Battle);
                         stage.show();
                     }
@@ -88,6 +305,7 @@ public class MainClient extends Application {
             }
         }.start();
     }
+
 
     public void Battle(Stage stage) {
 
@@ -106,16 +324,6 @@ public class MainClient extends Application {
 
         Image damage = new Image("sample/damage.png");
 
-        //init Pokemon and Item
-        Trainer t1 = new Trainer(new MT(), new seiryu(), new dragon());
-        Trainer t2 = new Trainer(new MT(), new yamata(), new darkelf());
-
-        t1.setItem(new Coffee(), new Aburasoba(), new Coffee());
-        t2.setItem(new Mazai(), new Aburasoba(), new Coffee());
-
-        p1.setImage(t1.getCenter().getImage());
-        p2.setImage(t2.getCenter().getImage());
-
         double p1_x = 40;
         double p1_y = 480;
 
@@ -130,44 +338,20 @@ public class MainClient extends Application {
         //keyboard
         Battle.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
-            if (isConnect) {
+            if (isConnect2) {
                 if (code.equals("LEFT") && t1.isRotable()) {
                     t1.setRotLflag(true);
-                    socket.send("LEFT");
+                    socket1.send("LEFT");
                 } else if (code.equals("RIGHT") && t1.isRotable()) {
                     t1.setRotRflag(true);
-                    socket.send("RIGHT");
+                    socket1.send("RIGHT");
                 } else if (t1.getCenter().isAlive()) {
                     if (code.equals("UP") && t1.checkRefreshed()) {
                         t1.setAttackflag(true);
-                        socket.send("UP");
+                        socket1.send("UP");
                     } else if (code.equals("DOWN") && t1.checkItem()) {
                         t1.setItemflag(true);
-                        socket.send("DOWN");
-                    }
-                }
-            } else {
-                if (code.equals("LEFT") && t1.isRotable()) {
-                    t1.setRotLflag(true);
-                } else if (code.equals("RIGHT") && t1.isRotable()) {
-                    t1.setRotRflag(true);
-                } else if (t1.getCenter().isAlive()) {
-                    if (code.equals("UP") && t1.checkRefreshed()) {
-                        t1.setAttackflag(true);
-                    } else if (code.equals("DOWN") && t1.checkItem()) {
-                        t1.setItemflag(true);
-                    }
-                }
-
-                if (code.equals("Z") && t2.isRotable()) {
-                    t2.setRotLflag(true);
-                } else if (code.equals("C") && t2.isRotable()) {
-                    t2.setRotRflag(true);
-                } else if (t2.getCenter().isAlive()) {
-                    if (code.equals("S") && t2.checkRefreshed()) {
-                        t2.setAttackflag(true);
-                    } else if (code.equals("X") && t2.checkItem()) {
-                        t2.setItemflag(true);
+                        socket1.send("DOWN");
                     }
                 }
             }
@@ -178,10 +362,10 @@ public class MainClient extends Application {
         //Battle Loop
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if(!isFinish) {
+                if(isConnect2 && !isFinish2) {
                     //Message Receive init
-                    if (!isInited && isConnect) {
-                        socket.onReceive(new OnReceiveListener() {
+                    if (!isInited) {
+                        socket1.onReceive(new OnReceiveListener() {
                             @Override
                             public void onReceive(String str) {
                                 if (str.equals("LEFT") && t2.isRotable()) {
@@ -199,6 +383,8 @@ public class MainClient extends Application {
                         });
                         isInited = true;
                     }
+                    p1.setImage(t1.getCenter().getImage());
+                    p2.setImage(t2.getCenter().getImage());
 
                     double t = (currentNanoTime - startNanoTime) / 1000000000.0;
 
@@ -218,26 +404,22 @@ public class MainClient extends Application {
 
                     //if win or lose, jump next scene
                     if (t1.isWin() || t2.checkLose()) {
-                        isFinish = true;
-                        if (isConnect) {
-                            while(true) {
-                                if(!socket.isClosed()) {
-                                    socket.close();
-                                }else{
-                                    break;
-                                }
+                        isFinish2 = true;
+                        while(true) {
+                            if(!socket1.isClosed()) {
+                                socket1.close();
+                            }else{
+                                break;
                             }
                         }
                         stage.setScene(WinResult);
                         stage.show();
                     }
                     if (t2.isWin() || t1.checkLose()) {
-                        isFinish = true;
-                        if(isConnect) {
-                            while (true) {
-                                if (socket.isClosed()) {
-                                    break;
-                                }
+                        isFinish2 = true;
+                        while (true) {
+                            if (socket1.isClosed()) {
+                                break;
                             }
                         }
                         stage.setScene(LoseResult);
