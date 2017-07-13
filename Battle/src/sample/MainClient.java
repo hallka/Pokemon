@@ -237,8 +237,6 @@ public class MainClient extends Application {
                         isInited = true;
                     }
 
-                    double t = (currentNanoTime - startNanoTime) / 1000000000.0;
-
                     gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
                     gc.fillRect(0, 0, 1024, 1024);
 
@@ -296,9 +294,8 @@ public class MainClient extends Application {
         root.getChildren().add(image);
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if(isFinish1) {
-                    if(!isConnect2) {
-                        socket1.close();
+                if(isFinish1 && !isFinish2) {
+                    if(!isConnect2 && socket1.isClosed()) {
                         isConnect2 = true;
                         socket2 = new SocketClient(host, port1);
                     }
@@ -314,7 +311,6 @@ public class MainClient extends Application {
 
 
     public void Battle(Stage stage) {
-
         Group root = new Group();
         this.Battle = new Scene(root);
 
@@ -389,13 +385,12 @@ public class MainClient extends Application {
                         });
                         isInited = true;
                     }
-                    p1.setImage(t1.getCenter().getImage());
-                    p2.setImage(t2.getCenter().getImage());
-
-                    double t = (currentNanoTime - startNanoTime) / 1000000000.0;
 
                     gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
                     gc.fillRect(0, 0, 1024, 1024);
+
+                    p1.setImage(t1.getCenter().getImage());
+                    p2.setImage(t2.getCenter().getImage());
 
                     t1.refresh(3);
                     t2.refresh(3);
@@ -413,6 +408,7 @@ public class MainClient extends Application {
                         isFinish2 = true;
                         while(true) {
                             if(!socket2.isClosed()) {
+                                socket2.send("CLOSE");
                                 socket2.close();
                             }else{
                                 break;

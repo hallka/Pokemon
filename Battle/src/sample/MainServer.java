@@ -235,8 +235,6 @@ public class MainServer extends Application {
                         isInited = true;
                     }
 
-                    double t = (currentNanoTime - startNanoTime) / 1000000000.0;
-
                     gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
                     gc.fillRect(0, 0, 1024, 1024);
 
@@ -287,8 +285,9 @@ public class MainServer extends Application {
         root.getChildren().add(image);
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if(isFinish1) {
+                if(isFinish1 && !isFinish2) {
                     if(!isConnect2) {
+                        socket1.send("CLOSE");
                         socket1.close();
                         socket2 = new SocketServer(port1);
                         isConnect2 = true;
@@ -379,8 +378,6 @@ public class MainServer extends Application {
                         isInited = true;
                     }
 
-                    double t = (currentNanoTime - startNanoTime) / 1000000000.0;
-
                     gc.setFill(new Color(0.85, 0.85, 1.0, 1.0));
                     gc.fillRect(0, 0, 1024, 1024);
 
@@ -403,6 +400,7 @@ public class MainServer extends Application {
                         isFinish2 = true;
                         while(true) {
                             if(!socket2.isClosed()) {
+                                socket2.send("CLOSE");
                                 socket2.close();
                             }else{
                                 break;
@@ -511,7 +509,6 @@ public class MainServer extends Application {
         this.LoseResult = new Scene(root);
         ImageView image = new ImageView("sample/pose_lose_boy.png");
         root.getChildren().add(image);
-
         LoseResult.setOnKeyPressed(event -> {
             String code = event.getCode().toString();
             if (code.equals("Z")) {
