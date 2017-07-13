@@ -17,7 +17,8 @@ import java.io.*;
 public class MainClient extends Application {
     private static int port1 = 54312;
     private SocketClient socket1 = null;
-    private String host = "PC";
+    private SocketClient socket2 = null;
+    private String host = "you";
     private Boolean isConnect1 = false;
     private Boolean isConnect2 = false;
     private Boolean isInited = false;
@@ -88,7 +89,7 @@ public class MainClient extends Application {
         root.getChildren().add(image);
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if(!isInited) {
+                if(!isInited && !isFinish1) {
                     if (isConnect1 && !isReady) {
                         socket1 = new SocketClient(host, port1);
                         isReady = true;
@@ -227,6 +228,8 @@ public class MainClient extends Application {
                                         isUsed[reserve2[ptr2]] = false;
                                         reserve2[ptr2] = -1;
                                     }
+                                }else if(str.equals("END")){
+                                    isFinish1 = true;
                                 }
 
                             }
@@ -248,10 +251,20 @@ public class MainClient extends Application {
                     if(ptr1 == 3 && ptr2 == 3){
                         t1 = new Trainer(plist[reserve1[1]],plist[reserve1[0]],plist[reserve1[2]]);
                         t2 = new Trainer(plist[reserve2[1]],plist[reserve2[0]],plist[reserve2[2]]);
-                        isFinish1 = true;
-                        //socket1.close();
-                        stage.setScene(Ready);
-                        stage.show();
+                        while (true) {
+                            if (isFinish1) {
+                                stage.setScene(Ready);
+                                stage.show();
+                                break;
+                            }else{
+                                socket1.send("END");
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
                     }
 
                 }
@@ -283,20 +296,13 @@ public class MainClient extends Application {
         root.getChildren().add(image);
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if(isConnect1 && isFinish1) {
-                    if(socket1.isClosed()) {
-                        socket1 = new SocketClient(host,port1);
-                        isConnect2 = true;
-                    }else if(socket1.isConnected()){
-                        try {
-                            Thread.sleep(150);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                if(isFinish1) {
+                    if(!isConnect2) {
                         socket1.close();
+                        isConnect2 = true;
+                        socket2 = new SocketClient(host, port1);
                     }
-                    isConnect2 = true;
-                    if (isConnect2) {
+                    if (isConnect2 && socket2.isConnected()){
                         isInited = false;
                         stage.setScene(Battle);
                         stage.show();
@@ -341,17 +347,17 @@ public class MainClient extends Application {
             if (isConnect2) {
                 if (code.equals("LEFT") && t1.isRotable()) {
                     t1.setRotLflag(true);
-                    socket1.send("LEFT");
+                    socket2.send("LEFT");
                 } else if (code.equals("RIGHT") && t1.isRotable()) {
                     t1.setRotRflag(true);
-                    socket1.send("RIGHT");
+                    socket2.send("RIGHT");
                 } else if (t1.getCenter().isAlive()) {
                     if (code.equals("UP") && t1.checkRefreshed()) {
                         t1.setAttackflag(true);
-                        socket1.send("UP");
+                        socket2.send("UP");
                     } else if (code.equals("DOWN") && t1.checkItem()) {
                         t1.setItemflag(true);
-                        socket1.send("DOWN");
+                        socket2.send("DOWN");
                     }
                 }
             }
@@ -365,7 +371,7 @@ public class MainClient extends Application {
                 if(isConnect2 && !isFinish2) {
                     //Message Receive init
                     if (!isInited) {
-                        socket1.onReceive(new OnReceiveListener() {
+                        socket2.onReceive(new OnReceiveListener() {
                             @Override
                             public void onReceive(String str) {
                                 if (str.equals("LEFT") && t2.isRotable()) {
@@ -406,8 +412,8 @@ public class MainClient extends Application {
                     if (t1.isWin() || t2.checkLose()) {
                         isFinish2 = true;
                         while(true) {
-                            if(!socket1.isClosed()) {
-                                socket1.close();
+                            if(!socket2.isClosed()) {
+                                socket2.close();
                             }else{
                                 break;
                             }
@@ -418,7 +424,7 @@ public class MainClient extends Application {
                     if (t2.isWin() || t1.checkLose()) {
                         isFinish2 = true;
                         while (true) {
-                            if (socket1.isClosed()) {
+                            if (socket2.isClosed()) {
                                 break;
                             }
                         }

@@ -68,7 +68,6 @@ public class SocketClient {
     public void close(){
         try {
             CloseFlag = true;
-            this.send("CLOSE");
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

@@ -69,7 +69,6 @@ public class SocketServer {
     public void close() {
         try {
             CloseFlag = true;
-            this.send("CLOSE");
             socket.close();
             s.close();
         } catch (IOException e) {
